@@ -74,13 +74,16 @@ func main() {
 			if stat.IsDir() {
 				err := filepath.Walk(*createACM, func(path string, info os.FileInfo, err error) error {
 					if info.IsDir() {
-						log.Fatalf("%s must contain acm files only", *createACM)
+						if info.Name() == filepath.Base(*createACM) {
+							return nil // skip root
+						}
+						log.Fatalf("%s must contain acm files only. Found %s", *createACM, path)
 					}
 					acms = append(acms, path)
 					return nil
 				})
 				if err != nil {
-					panic(err)
+					log.Fatal(err)
 				}
 			} else {
 				acms = append(acms, *createACM)
